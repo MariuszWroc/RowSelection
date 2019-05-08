@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <title>Baza zawodnikow - Ekstraklasa 2013</title>
+            </f:facet>
+        </h:head>
+        
+        <h:body>
+            <p:layout fullPage="true">
+                <p:layoutUnit position="center">
+                    <h:form id="form">   
+                    <p:growl id="growl" showDetail="true"/>   
+                    <p:dataTable id="teamTable" var="team" value="#{tableBean.teams}" paginator="true" rows="10"  
+                                     rowKey="#{team.id}" selection="#{tableBean.selectedOne}" selectionMode="single">  
+
+                            <p:ajax event="rowSelect" listener="#{tableBean.onRowSelect}"   
+                                    update=":form:dataList: :form:playersTable :form:growl"  />  
+                            <p:ajax event="rowUnselect" listener="#{tableBean.onRowUnselect}"
+                                    update=":form:dataList :form:playersTable :form:growl" oncomplete="teamDialog.hide()"/>  
+
+                            <f:facet name="header">  
+                                Zaznacz klub aby wyswietlic sklad   
+                            </f:facet>  
+
+                            <p:column headerText="Nazwa klubu">  
+                                #{team.name}  
+                            </p:column>  
+
+                            <p:column headerText="Rok zalozenia">  
+                                #{team.foundingYear}  
+                            </p:column>  
+
+                            <p:column headerText="Skrocona nazwa">  
+                                #{team.shortName}  
+                            </p:column>  
+
+                            <p:column headerText="Barwy">  
+                                #{team.colours}  
+                            </p:column>  
+                    </p:dataTable>  
+
+                    <p:dataTable id="playersTable" var="player" value="#{tableBean.selectedOne.players}" paginator="true" rows="10" emptyMessage="brak wybranego skladu">   
+                            <f:facet name="header">  
+                                Druzyna 
+                            </f:facet>  
+
+                            <p:column headerText="Imie">  
+                                #{player.name}  
+                            </p:column>  
+
+                            <p:column headerText="Nazwisko">  
+                                #{player.secondName}  
+                            </p:column>  
+                     </p:dataTable> 
+                    
+                     <p:dialog id="dialog" header="Druzyna" widgetVar="teamDialog" resizable="false"  
+                                   width="500" showEffect="clip" hideEffect="fold" position="center" >
+                         <div align="center">
+                            <h:outputText value="brak danych" rendered="#{tableBean.selectedOne == null}"/>  
+                         </div>
+                            <p:dataList id="dataList" value="#{tableBean.selectedOne}"  var="teamList" type="definition" rendered="#{tableBean.selectedOne != null}">  
+                                 Klub: #{teamList.name}, zalozony w: #{teamList.foundingYear}, skrocona nazwa: #{teamList.shortName}, barwy: #{teamList.colours}
+                                 <f:facet name="description">
+                                    <p:dataList value="#{teamList.players}" var="playerPerTeam"  rows="10" paginator="true">
+                                        Imie: #{playerPerTeam.name}, nazwisko: #{playerPerTeam.secondName}
+                                    </p:dataList>
+                                 </f:facet>
+                             </p:dataList>
+                      </p:dialog>
+                       <div align="center">
+                            <p:commandButton id="viewButton" value="Pokaz okno dialogowe" icon="ui-icon-search" update=":form:dialog :form:growl" oncomplete="teamDialog.show()" />
+                       </div>
+                   </h:form> 
+                </p:layoutUnit>
+            </p:layout>
+        </h:body>
+    </f:view>
+</html>
+
